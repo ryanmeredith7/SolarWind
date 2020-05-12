@@ -1,4 +1,4 @@
-function getOmni, year, month ;test
+function getOmni, year, month
     compile_opt idl2, logical_predicate
     on_error, 2
 
