@@ -25,7 +25,8 @@ function getOmni, year, month
     if ~file_test(localDir, /directory) then file_mkdir, localDir
 
     ;Creates the place to put the data file.
-    localPath = filepath(string(year, month, format="%4I-%02I.cdf"), root_dir=localDir)
+    localName = string(year, month, format="%4I-%02I.cdf")
+    localPath = filepath(localName, root_dir=localDir)
 
     ;Sets up the path of the file to be downloaded.
     ftpRootDir = "pub/data/omni/omni_cdaweb/hro2_1min/"
