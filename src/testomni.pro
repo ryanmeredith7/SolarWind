@@ -8,7 +8,7 @@ function testOmni, data
     ;   data: Array with omni data. Right now is made for Pressure data,
     ;   but could work with other data set, this needs to be tested.
     ;   Also, could be extended or changed to use other data sets.
-    ;   
+    ;
     ;Return Value:
     ;   Boolean, true if there is a lot of activity, false otherwise.
     ;-

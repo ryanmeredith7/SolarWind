@@ -19,7 +19,7 @@ function getOmni, year, month
     ;Gets the base directory of the project.
     baseDir = routine_dir()
     if file_basename(baseDir) eq "src" then baseDir = file_dirname(baseDir)
-    
+
     ;Gets the folder to put data in and makes it if it doesn't exist.
     localDir = filepath("omni", subdirectory=["data","raw"], root_dir=baseDir)
     if ~file_test(localDir, /directory) then file_mkdir, localDir
