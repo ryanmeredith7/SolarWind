@@ -16,25 +16,28 @@ function getOmni, year, month
     if year lt 1995 then message, "No omni data from before 1995."
     if month lt 1 or month gt 12 then message, "Invalid month."
 
-    ;Sets up the location for the file to be downloaded to.
-    localDir = routine_dir()
-    if file_basename(localDir) eq "src" then localDir = file_dirname(localDir)
-    localPath = filepath( $
-        string(year, month, format="%4I-%02I.cdf"), $
-        subdirectory = ["data","raw","omni"], $
-        root_dir = localDir)
+    ;Gets the base directory of the project.
+    baseDir = routine_dir()
+    if file_basename(baseDir) eq "src" then baseDir = file_dirname(baseDir)
+    
+    ;Gets the folder to put data in and makes it if it doesn't exist.
+    localDir = filepath("omni", subdirectory=["data","raw"], root_dir=baseDir)
+    if ~file_test(localDir, /directory) then file_mkdir, localDir
+
+    ;Creates the place to put the data file.
+    localPath = filepath(string(year, month, format="%4I-%02I.cdf"), root_dir=localDir)
 
     ;Sets up the path of the file to be downloaded.
-    ftpDir = "pub/data/omni/omni_cdaweb/hro2_1min/"
+    ftpRootDir = "pub/data/omni/omni_cdaweb/hro2_1min/"
     ftpName = string(year, month, format="omni_hro2_1min_%4I%02I01_v01.cdf")
-    ftpPath = string(ftpDir, year, ftpName, format="%S/%4I/%S")
+    ftpPath = string(ftpRootDir, year, ftpName, format="%S/%4I/%S")
 
     ;Creates an ftp object to do the download.
     ftp = IDLnetURL( $
         url_scheme = "ftp", $
         url_hostname = "cdaweb.gsfc.nasa.gov", $
         url_path = ftpPath, $
-        ftp_connection_mode = 0)
+        ftp_connection_mode = 0 )
 
     ;Error handler, checks reason for error, then cleans up the ftp object.
     ;Depending on error, gives an informative error message, or rethrows.
