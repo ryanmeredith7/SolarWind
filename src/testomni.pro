@@ -32,7 +32,7 @@ results = boolarr(12, 25)
 for i = 0, 24 do begin
     for j = 0, 11 do begin
         file = findOmni(1995 + i, 1 + j)
-        if file = "" then file = getOmni(1995 + i, 1 + j)
+        if file eq "" then file = getOmni(1995 + i, 1 + j)
         *data[j,i] = readOmni(file)
     endfor
 endfor
@@ -48,8 +48,11 @@ repeat begin
         for j = 0, 11 do $
             results[j,i] = testOmni(*data[j,i], lim)
 
+    print, timegen(12, units="Months"), format='(5X, 12C(X, CMoA3))'
+    for i = 0, 24 do print, 1995 + i, results[*,i], format='(13I4)'
+
     read, ans, prompt="Would you like to continue? "
 
-endrep until ans.startsWith("n", /case_insesitive)
+endrep until ans.startsWith("n", /fold_case)
 
 end
