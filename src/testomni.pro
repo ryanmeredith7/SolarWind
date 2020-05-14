@@ -1,4 +1,4 @@
-function testOmni, data
+function testOmni, data, lim
     compile_opt idl2, logical_predicate
     on_error, 2
     ;+
@@ -19,7 +19,37 @@ function testOmni, data
     ;Gets the biggest value of the derivative.
     big = max(der)
 
-    ;Checks if the derivative is bigger than 3 anywhere.
-    return, boolean(big ge 3)
+    ;Checks if the derivative is bigger than lim anywhere.
+    return, boolean(big gt lim)
+
+end
+
+compile_opt idl2, logical_predicate
+
+data = ptrarr(12, 25, /allocate_heap)
+results = boolarr(12, 25)
+
+for i = 0, 24 do begin
+    for j = 0, 11 do begin
+        file = findOmni(1995 + i, 1 + j)
+        if file = "" then file = getOmni(1995 + i, 1 + j)
+        *data[j,i] = readOmni(file)
+    endfor
+endfor
+
+lim = 3
+ans = "Yes"
+
+repeat begin
+
+    read, lim, prompt="Minimum pressure rise rate (in nPa/min): "
+
+    for i = 0, 24 do $
+        for j = 0, 11 do $
+            results[j,i] = testOmni(*data[j,i], lim)
+
+    read, ans, prompt="Would you like to continue? "
+
+endrep until ans.startsWith("n", /case_insesitive)
 
 end
