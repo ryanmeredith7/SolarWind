@@ -27,7 +27,6 @@ end
 compile_opt idl2, logical_predicate
 
 data = ptrarr(12, 25, /allocate_heap)
-results = boolarr(12, 25)
 
 for i = 0, 24 do begin
     for j = 0, 11 do begin
@@ -39,6 +38,7 @@ endfor
 
 lim = 3
 ans = "Yes"
+results = boolarr(12, 25)
 
 repeat begin
 
@@ -48,7 +48,7 @@ repeat begin
         for j = 0, 11 do $
             results[j,i] = testOmni(*data[j,i], lim)
 
-    print, timegen(12, units="Months"), format='(5X, 12C(X, CMoA3))'
+    print, "      Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec"
     for i = 0, 24 do print, 1995 + i, results[*,i], format='(13I4)'
 
     read, ans, prompt="Would you like to continue? "
