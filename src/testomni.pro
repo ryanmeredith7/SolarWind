@@ -12,9 +12,11 @@ function testOmni, data, lim
     ;Return Value:
     ;   Boolean, true if there is a lot of activity, false otherwise.
     ;-
+    
+    smth = smooth(data, 15, /NaN, /edge_truncate)
 
     ;Gets the derivative of the data.
-    der = deriv(data)
+    der = deriv(smth)
 
     ;Gets the biggest value of the derivative.
     big = max(der)

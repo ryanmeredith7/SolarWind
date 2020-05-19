@@ -1,14 +1,14 @@
 pro SolarWind, data, results, quiet=quiet
     compile_opt idl2, logical_predicate
 
-    data = ptrarr(12, 25)
+    data = ptrarr(12, 25, /allocate_heap)
     results = boolarr(12, 25)
 
     for i = 0, 24 do begin
         for j = 0, 11 do begin
             file = findOmni(1995 + i, 1 + j)
             if file eq "" then file = getOmni(1995 + i, 1 + j)
-            data[j,i] = ptr_new(readOmni(file))
+            *data[j,i] = readOmni(file)
             results[j,i] = testOmni(*data[j,i], 6)
         endfor
     endfor
