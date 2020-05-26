@@ -1,49 +1,80 @@
-function func, m
+function test, x
     compile_opt idl2, logical_predicate
+    
+    jumps = 100
 
-    common globals, x, n, f, d1f, d2f
+    y = 3.0
 
-    sum = 0.0
+    n = n_elements(x)
 
-    for i = 0, n-1 do sum += total(f(x[i] - m, m[i] - m, x[i] - x, i - [0:n-1]), /NaN)
+    m = mean(x, /NaN)
 
-    return, sum
+    r = [0, n, replicate(n+1, jumps)]
 
-end
+    l = [m, replicate(!values.f_NaN, jumps)]
 
-function grad, m
-    compile_opt idl2, logical_predicate
+    npos = total((x - m)^2, /NaN)
 
-    common globals
+    s = [npos, replicate(!values.f_NaN, jumps)]
 
-    g = fltarr(n, /noZero)
+    pos = fltarr(n, /noZero)
 
-    for i = 0, n-1 do begin
-        d1 = x[i] - m
-        d2 = m[i] - m
-        d3 = x[i] - x
-        d4 = i - [0:n-1]
-        g[i] = total(d2f(d1, d2, d3, d4) - d1f(-d1, -d2, -d3, -d4) - d2f(-d1, -d2, -d3, -d4), /NaN)
-    endfor
+    m = fltarr(2, n, /noZero)
 
-    return, g
+    st = fltarr(2, n, /noZero)
 
-end
+    k = 0
 
-compile_opt idl2, logical_predicate
+    print, k, npos
 
-common globals
+    repeat begin
 
-file = findOmni(2000, 11)
-data = readOmni(file)
+        replicate_inplace, pos, !values.f_NaN
+        opos = temporary(npos)
 
-x = data
-n = n_elements(data)
+        for j = 0, k do begin
 
-f = lambda("d1, d2, d3, d4: d1*d1/2.0*float(d4 eq 0.0) + 1e15*abs(d2)")
-d1f = lambda("d1, d2, d3, d4: d1*(d4 = 0)")
-d2f = lambda("d1, d2, d3, d4: 1e15*signum(d2)")
+            ri = r[j]
+            rf = r[j+1]-1
 
-dfpmin, data, 1e-6, fmin, "func", "grad"
+            for i = ri+1, rf do begin
+
+                x1 = x[ri:i-1]
+                x2 = x[i:rf]
+
+                m1 = mean(x1, /NaN)
+                m2 = mean(x2, /NaN)
+
+                st[0,i] = [total((x1 - m1)^2, /NaN), total((x2 - m2)^2, /NaN)]
+
+                pos[i] = total(st[*,i], /NaN) + total(s, /NaN) - s[j]
+
+                m[0,i] = [m1, m2]
+
+            endfor
+
+        endfor
+
+        npos = min(pos, i, /NaN)
+        print, k + 1, npos
+
+        r[k+2] = i
+        r[0] = r.sort(count=k+3)
+
+        j = (where(r eq i))[0] - 1
+
+        l[j] = j ge k ? m[*,i] : [m[*,i], l[j+1:k]]
+
+        s[j] = j ge k ? st[*,i] : [st[*,i], l[j+1:k]]
+        
+        k += 1
+
+    endrep until (opos - npos le 120.0)
+
+    out = fltarr(n, /noZero)
+
+    for i = 0, k do out[r[i]:r[i+1]-1] = l[i]
+
+    return, out
 
 end
