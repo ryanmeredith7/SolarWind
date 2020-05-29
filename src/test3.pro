@@ -3,7 +3,7 @@ function test3, inData
 
     regConst = 120.0
 
-    buffer = 100
+    buffer = 200
 
     n = n_elements(inData)
 
@@ -17,8 +17,6 @@ function test3, inData
     @mkpart
 
     lossDiff = loss - total(partition.losses)
-    loss -= lossDiff
-    print, loss
 
     partitions = replicate(partition, buffer + 1)
 
@@ -28,7 +26,7 @@ function test3, inData
 
     while lossDiff gt regConst do begin
 
-        oldLoss = temporary(newLoss)
+        print, k, lossDiff
 
         thisPart = partitions[splitInd]
 
@@ -47,8 +45,6 @@ function test3, inData
         partitions[++k] = partition
 
         lossDiff = max(partitions[0:k].loss - total(partitions[0:k].losses, 1), splitInd)
-        loss -= lossDiff
-        print, loss
 
     endwhile
 

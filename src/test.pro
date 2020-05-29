@@ -1,9 +1,9 @@
 function test, x
     compile_opt idl2, logical_predicate
     
-    jumps = 100
+    jumps = 200
 
-    y = 3.0
+    y = 120.0
 
     n = n_elements(x)
 
@@ -24,8 +24,6 @@ function test, x
     st = fltarr(2, n, /noZero)
 
     k = 0
-
-    print, k, npos
 
     repeat begin
 
@@ -56,7 +54,7 @@ function test, x
         endfor
 
         npos = min(pos, i, /NaN)
-        print, k + 1, npos
+        print, k, opos - npos
 
         r[k+2] = i
         r[0] = r.sort(count=k+3)
@@ -65,11 +63,11 @@ function test, x
 
         l[j] = j ge k ? m[*,i] : [m[*,i], l[j+1:k]]
 
-        s[j] = j ge k ? st[*,i] : [st[*,i], l[j+1:k]]
+        s[j] = j ge k ? st[*,i] : [st[*,i], s[j+1:k]]
         
         k += 1
 
-    endrep until (opos - npos le 120.0)
+    endrep until opos - npos le y
 
     out = fltarr(n, /noZero)
 
