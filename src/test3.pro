@@ -3,7 +3,7 @@ function test3, inData
 
     regConst = 120.0
 
-    buffer = 200
+    buffer = 50
 
     n = n_elements(inData)
 
@@ -23,10 +23,19 @@ function test3, inData
     splitInd = 0
 
     k = 0
+    
+    catch, error
+    if error then begin
+        if k-- gt buffer then begin
+            message, /informational, "no more room in buffer, making it bigger"
+            partitions = [temporary(partitions), replicate(partition, buffer)]
+        endif else begin
+            catch, /cancel
+            message, /reissue_last
+        endelse
+    endif
 
     while lossDiff gt regConst do begin
-
-        print, k, lossDiff
 
         thisPart = partitions[splitInd]
 
@@ -44,10 +53,10 @@ function test3, inData
         @mkpart
         partitions[++k] = partition
 
-        lossDiff = max(partitions[0:k].loss - total(partitions[0:k].losses, 1), splitInd)
+        lossDiff = max(partitions[0:k].diff, splitInd)
 
     endwhile
 
-    return, partitions[0:k]
+    return, partitions[sort(partitions[0:k].start)]
 
 end
