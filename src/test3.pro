@@ -3,7 +3,7 @@ function test3, inData
 
     regConst = 120.0
 
-    buffer = 50
+    buffer = 200
 
     n = n_elements(inData)
 
@@ -25,15 +25,14 @@ function test3, inData
     k = 0
     
     catch, error
-    if error then begin
+    if error then $
         if k-- gt buffer then begin
-            message, /informational, "no more room in buffer, making it bigger"
+            message, /informational, "No more room in buffer, making it bigger"
             partitions = [temporary(partitions), replicate(partition, buffer)]
         endif else begin
             catch, /cancel
             message, /reissue_last
         endelse
-    endif
 
     while lossDiff gt regConst do begin
 
