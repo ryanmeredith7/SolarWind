@@ -33,8 +33,8 @@ function readTEC, file, ismrTemplate
 
         t = raw.tow[ind]
 
-        ts = transpose([[t - 45], [t - 30], [t - 15], [t]])
-        
+        ts = transpose([[t - 45.0], [t - 30.0], [t - 15.0], [t]])
+
         y = reform([[ts], [raw.tec[0:6:2,ind]], [raw.tec[1:7:2,ind]]], n * 4, 3)
 
         data[i] = ptr_new(y, /no_copy)
