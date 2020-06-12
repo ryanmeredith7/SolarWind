@@ -1,12 +1,11 @@
-function findOmni, year, month
+function findOmni, date
     compile_opt idl2, logical_predicate
     on_error, 2
     ;+
     ;This function finds previously downloaded CDF files containing omni data.
     ;
     ;Arguments:
-    ;   year: Year of requested data as integer.
-    ;   month: Month of requested data as integer.
+    ;   date: Julian day of desired data.
     ;
     ;Return Value:
     ;   String containing path to file if it exists,
@@ -24,7 +23,7 @@ function findOmni, year, month
     ;Creates the path where the file should be.
     file = filepath( $
         string(year, month, format="%4I-%02I.cdf"), $
-        subdirectory = ["data","raw","omni"], $
+        subdirectory = ["data","omni"], $
         root_dir = baseDir )
 
     ;Checks if the file exists.
