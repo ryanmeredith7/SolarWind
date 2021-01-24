@@ -12,9 +12,10 @@ function findOmni, date
     ;   or empty string if it doesn't.
     ;-
 
+    caldat, date, month, !null, year
+
     ;Checks if year and month are valid.
     if year lt 1995 then message, "No omni data from before 1995."
-    if month lt 1 or month gt 12 then message, "Invalid month."
 
     ;Finds the base folder for the project.
     baseDir = routine_dir()

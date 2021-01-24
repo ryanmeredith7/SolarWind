@@ -7,56 +7,38 @@ function test2, inData
 
     n = n_elements(inData)
 
-    jumps = lonarr(buffer + 2, /noZero)
-    jumps[0] = 0
-    jumps[1] = n
+    avg = total(inData, /NaN) / total(finite(inData), /integer)
 
-    levels = fltarr(buffer + 1, /noZero)
+    loss = total((inData - avg)^2, /NaN)
 
-    losses = fltarr(buffer + 1, /noZero)
-    lossPos = lonarr(buffer + 1, /noZero)
+    partitions = objarr(buffer + 1)
 
-    lossFun = lambda("x, y: (x - y) ^ 2")
-    print, "Created ", lossFun
+    partitions[0] = obj_new('partition', inData, 0, n - 1, avg, loss)
+
+    lossDiff = loss - total(partitions[0].losses)
+
+    splitInd = 0
 
     k = 0
 
-    repeat begin
+    catch, error
+    if error then $
+        if k-- gt buffer then begin
+            message, /informational, "No more room in buffer, making it bigger"
+            partitions = [temporary(partitions), objarr(buffer)]
+        endif else begin
+            catch, /cancel
+            message, /reissue_last
+        endelse
 
-        if k eq 0 then begin
+    while lossDiff gt regConst do begin
 
-            avg = total(inData, /NaN) / total(finite(inData), /integer)
-            levels[0] = avg
+        partitions[[splitInd,++k]] = partitons[splitInd].split(inData)
 
-            newLoss = total((inData - temporary(avg))^2, /NaN)
-            losses[0] = newLoss
-            losspos[0] = 0
+        lossDiff = max(partitions[0:k].diff, splitInd)
 
-            as = 0
-            bs = n - 1
+    endwhile
 
-        endif
-
-        foreach a, as, i do begin
-
-            b = bs[i]
-
-            x1 = inData[a:b-1]
-            x2 = rotate(inData[a+1:b], 5)
-
-            m1 = total(x1, /NaN, /cumulative) $
-                / total(float(finite(x1)), /cumulative)
-            m2 = total(x2, /NaN, /cumulative) $
-                / total(float(finite(x2)), /cumulative)
-            m2 = rotate(temporary(m2), 5)
-
-            s = fltarr(b - a - 1, /noZero)
-            for k = 0, b - a - 2 do $
-                s[k] = total((x1[0:k] - m1[k])^2, /NaN) $
-                + total((x2[0:-1-k] - m2[k])^2, /NaN)
-
-        endforeach
-
-    endrep until oldLoss - newLoss lt regConst
+    return, partitions[sort(partitions[0:k].start)]
 
 end
